@@ -221,6 +221,7 @@ attention to case differences."
     racket
     rpm-rpmlint
     markdown-mdl
+    markdown-remark-lint
     nix
     rst-sphinx
     rst
@@ -8708,6 +8709,24 @@ See URL `https://github.com/mivok/markdownlint'."
   (lambda (errors)
     (flycheck-sanitize-errors
      (flycheck-remove-error-file-names "(stdin)" errors)))
+  :modes (markdown-mode gfm-mode))
+
+(flycheck-define-checker markdown-remark-lint
+  "Markdown checker using remark-lint.
+
+See URL `https://github.com/wooorm/remark-lint'."
+  :command ("remark"
+            "--no-color"
+            "--no-stdout")
+  :standard-input t
+  :error-patterns
+  ((warning line-start (>= 2 " ")
+            line ":" column (zero-or-more not-newline)
+            "  warning  "
+            (message (minimal-match (one-or-more not-newline))) (>= 2 " ")
+            (id (one-or-more (or word "-")))
+            (zero-or-more not-newline) line-end)
+   (error line-start (>= 2 " ") line ":" column "  error  " (message) line-end))
   :modes (markdown-mode gfm-mode))
 
 (flycheck-define-checker nix
